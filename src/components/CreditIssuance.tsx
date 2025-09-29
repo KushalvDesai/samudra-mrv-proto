@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export const CreditIssuance = () => {
         qualityMultiplier,
         verificationBonus,
         totalCredits,
-        estimatedValue: totalCredits * 25 // $25 per credit estimate
+        estimatedValue: totalCredits * 2100 // ₹2100 per credit estimate
       };
       
       setCalculation(calc);
@@ -224,10 +225,10 @@ export const CreditIssuance = () => {
                     <div className="bg-card p-4 rounded-lg">
                       <h4 className="font-medium mb-3">Estimated Market Value</h4>
                       <div className="text-3xl font-bold text-success mb-2">
-                        ${calculation.estimatedValue.toLocaleString()}
+                        ₹{calculation.estimatedValue.toLocaleString()}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Based on current market rate of $25/credit
+                        Based on current market rate of ₹2100/credit
                       </p>
                     </div>
                   </div>
@@ -300,7 +301,7 @@ export const CreditIssuance = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Estimated Value:</span>
-                      <span className="font-semibold text-success">${calculation?.estimatedValue.toLocaleString()}</span>
+                      <span className="font-semibold text-success">₹{calculation?.estimatedValue.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -340,3 +341,4 @@ export const CreditIssuance = () => {
     </Card>
   );
 };
+
