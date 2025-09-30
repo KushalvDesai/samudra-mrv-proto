@@ -22,13 +22,14 @@ import {
   BarChart3,
   Archive
 } from "lucide-react";
+import { dashboardStats } from "@/data/mockProjects";
 
-// Mock registry data for NCCR oversight
+// Registry stats based on actual mock data
 const registryStats = [
-  { name: "Total Registered Projects", count: 127, trend: "+12%" },
-  { name: "Active Projects", count: 89, trend: "+8%" }, 
-  { name: "Pending Approval", count: 23, trend: "+5%" },
-  { name: "Total Area (Hectares)", count: 34567, trend: "+15%" }
+  { name: "Total Registered Projects", count: dashboardStats.totalProjects, trend: "+15%" },
+  { name: "Active Projects", count: dashboardStats.activeProjects, trend: "+8%" }, 
+  { name: "Pending Approval", count: dashboardStats.projectsAwaitingVerification, trend: "+5%" },
+  { name: "Total Credits Issued", count: dashboardStats.totalCreditsIssued, trend: "+18%" }
 ];
 
 const recentProjects = [
@@ -478,7 +479,7 @@ export const NationalRegistryOverview = () => {
             <div className="text-center">
               <FileText className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Review Pending</h3>
-              <p className="text-base text-gray-600 mb-4">23 projects awaiting NCCR approval</p>
+              <p className="text-base text-gray-600 mb-4">{dashboardStats.projectsAwaitingVerification} projects awaiting NCCR approval</p>
               <Button className="w-full text-base h-10">Review Projects</Button>
             </div>
           </CardContent>

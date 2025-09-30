@@ -9,7 +9,8 @@ import {
   Shield,
   Users,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Map
 } from "lucide-react";
 import { useState } from "react";
 
@@ -85,9 +86,19 @@ const navigationItems: NavigationItem[] = [
     icon: BarChart3,
     hasSubmenu: true,
     submenuItems: [
+      { id: "dashboard", label: "Analytics Dashboard" },
       { id: "statistics", label: "National Statistics" },
       { id: "insights", label: "Research Insights" },
       { id: "policy", label: "Policy Reports" }
+    ]
+  },
+  {
+    id: "mapping",
+    label: "Mapping",
+    icon: Map,
+    hasSubmenu: true,
+    submenuItems: [
+      { id: "visualization", label: "Map Visualization" }
     ]
   },
   {
@@ -155,12 +166,12 @@ export const SidebarNavigation = ({
       {/* Logo/Brand Section */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-            <Database className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+            <img src="/logo.svg" alt="SamudraMRV Logo" className="samudra-logo" />
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold text-gray-900 truncate">NCCR Blue Carbon</h1>
-            <p className="text-xs text-gray-500 font-medium">Registry Authority</p>
+            <h1 className="text-lg font-bold text-gray-900 truncate">SamudraMRV</h1>
+            <p className="text-xs text-gray-500 font-medium">Marine Restoration</p>
           </div>
         </div>
       </div>
@@ -245,8 +256,8 @@ export const SidebarNavigation = ({
             <Building2 className="w-5 h-5 text-gray-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">NCCR Admin</p>
-            <p className="text-xs text-gray-500 truncate">admin@nccr.gov.in</p>
+            <p className="text-sm font-semibold text-gray-900 truncate">SamudraMRV Admin</p>
+            <p className="text-xs text-gray-500 truncate">admin@samudramrv.org</p>
           </div>
         </div>
       </div>

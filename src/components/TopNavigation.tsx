@@ -26,7 +26,7 @@ interface TopNavigationProps {
 }
 
 export const TopNavigation = ({
-  breadcrumbs = [{ label: "NCCR Blue Carbon" }, { label: "Dashboard" }],
+  breadcrumbs = [{ label: "SamudraMRV" }, { label: "Dashboard" }],
   notifications = 3,
   messages = 2,
   onThemeToggle,

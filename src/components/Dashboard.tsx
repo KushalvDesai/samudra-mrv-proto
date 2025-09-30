@@ -4,8 +4,6 @@ import { StatisticsCards } from "@/components/StatisticsCards";
 import { DashboardCharts } from "@/components/DashboardCharts";
 import { ProjectRegistry } from "@/components/ProjectRegistry";
 import { ImageUpload } from "@/components/ImageUpload";
-import { NotificationPanel } from "@/components/NotificationPanel";
-import { CreditIssuance } from "@/components/CreditIssuance";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { MapVisualization } from "@/components/MapVisualization";
 import { UserManagement } from "@/components/UserManagement";
@@ -42,14 +40,14 @@ export const Dashboard = () => {
 
   // Enhanced section change handler with debugging and loading state
   const handleSectionChange = (sectionId: string) => {
-    console.log("🔄 Section changed to:", sectionId);
+    console.log("[DASHBOARD] Section changed to:", sectionId);
     setIsLoading(true);
     setActiveSection(sectionId);
     
     // Show brief success feedback
     setTimeout(() => {
       setIsLoading(false);
-      console.log("✅ Successfully loaded:", sectionId);
+      console.log("[DASHBOARD] Successfully loaded:", sectionId);
     }, 150);
   };
 
@@ -91,14 +89,14 @@ export const Dashboard = () => {
     };
 
     return [
-      { label: "NCCR Blue Carbon" },
+      { label: "SamudraMRV" },
       { label: sectionLabels[section] || section },
       ...(subsection ? [{ label: subsectionLabels[subsection] || subsection }] : [])
     ];
   };
 
   const renderMainContent = () => {
-    console.log("📍 Rendering content for section:", activeSection);
+    console.log("[RENDER] Rendering content for section:", activeSection);
     
     switch (activeSection) {
       // National Registry sections
@@ -202,6 +200,12 @@ export const Dashboard = () => {
         );
 
       // Analytics & Reporting sections
+      case "analytics-dashboard":
+        return (
+          <div className="h-full">
+            <AnalyticsDashboard />
+          </div>
+        );
       case "analytics-statistics":
         return (
           <div className="h-full flex flex-col">
@@ -223,6 +227,14 @@ export const Dashboard = () => {
         return (
           <div className="h-full">
             <AnalyticsPolicy />
+          </div>
+        );
+
+      // Mapping sections
+      case "mapping-visualization":
+        return (
+          <div className="h-full">
+            <MapVisualization />
           </div>
         );
 
@@ -248,7 +260,7 @@ export const Dashboard = () => {
 
       // Default case - Registry Overview
       default:
-        console.warn("⚠️ Unknown section:", activeSection, "- defaulting to Registry Overview");
+        console.warn("[WARNING] Unknown section:", activeSection, "- defaulting to Registry Overview");
         return (
           <div className="h-full">
             <NationalRegistryOverview />

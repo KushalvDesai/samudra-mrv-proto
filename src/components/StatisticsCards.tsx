@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Database, ClipboardCheck, Microscope, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { mockProjects, dashboardStats } from "@/data/mockProjects";
 
 interface StatCardProps {
   title: string;
@@ -64,35 +65,41 @@ const StatCard = ({
 };
 
 export const StatisticsCards = () => {
+  // Calculate dynamic statistics from actual project data
+  const verifiedProjects = mockProjects.filter(p => p.status === 'verified').length;
+  const pendingValidations = mockProjects.filter(p => p.status === 'pending' || p.status === 'monitoring').length;
+  const completedProjects = mockProjects.filter(p => p.status === 'completed').length;
+  const complianceRate = Math.round((verifiedProjects + completedProjects) / mockProjects.length * 100);
+
   const stats = [
     {
       title: "Registered Projects",
-      value: "127",
-      change: "+12.3%",
+      value: dashboardStats.totalProjects.toString(),
+      change: "+15.4%",
       changeType: "increase" as const,
       icon: Database,
       iconColor: "text-blue-600"
     },
     {
       title: "Pending Validations",
-      value: "23",
-      change: "+8.1%",
-      changeType: "increase" as const,
+      value: pendingValidations.toString(),
+      change: "-5.2%",
+      changeType: "decrease" as const,
       icon: ClipboardCheck,
       iconColor: "text-yellow-600"
     },
     {
       title: "Scientific Reviews",
-      value: "45",
-      change: "+15.7%",
+      value: (verifiedProjects + completedProjects).toString(),
+      change: "+18.3%",
       changeType: "increase" as const,
       icon: Microscope,
       iconColor: "text-purple-600"
     },
     {
       title: "Compliance Rate",
-      value: "94%",
-      change: "+2.3%",
+      value: `${complianceRate}%`,
+      change: "+3.1%",
       changeType: "increase" as const,
       icon: BarChart3,
       iconColor: "text-green-600"

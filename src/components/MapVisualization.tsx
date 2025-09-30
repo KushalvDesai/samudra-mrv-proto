@@ -12,9 +12,14 @@ import {
   RotateCcw,
   Eye,
   EyeOff,
-  AlertTriangle
+  AlertTriangle,
+  Navigation,
+  Sprout,
+  BarChart3
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { InteractiveMap, type MapRef } from "./InteractiveMap";
+import { mockProjects } from "@/data/mockProjects";
 
 const ProjectLocation = ({ 
   name, 
@@ -22,14 +27,16 @@ const ProjectLocation = ({
   status, 
   type, 
   ndvi,
-  area 
+  area,
+  description 
 }: {
   name: string;
-  coordinates: string;
+  coordinates: [number, number];
   status: string;
   type: string;
   ndvi: number;
   area: number;
+  description: string;
 }) => (
   <div className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
     <div className="flex items-start justify-between mb-2">
@@ -41,15 +48,37 @@ const ProjectLocation = ({
         {status}
       </Badge>
     </div>
+    <p className="text-sm text-muted-foreground mb-2">{description}</p>
     <div className="space-y-1 text-sm text-muted-foreground">
-      <p>📍 {coordinates}</p>
-      <p>🌱 {type}</p>
-      <p>📊 NDVI: {ndvi} | Area: {area} ha</p>
+      <div className="flex items-center gap-2">
+        <Navigation className="h-3 w-3" />
+        <span>{coordinates[0].toFixed(2)}°, {coordinates[1].toFixed(2)}°</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Sprout className="h-3 w-3" />
+        <span>{type}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <BarChart3 className="h-3 w-3" />
+        <span>NDVI: {ndvi} | Area: {area} ha</span>
+      </div>
     </div>
   </div>
 );
 
-const MapControls = () => (
+const MapControls = ({ 
+  onZoomIn, 
+  onZoomOut, 
+  onResetView, 
+  layers, 
+  onLayerToggle 
+}: {
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onResetView: () => void;
+  layers: { [key: string]: boolean };
+  onLayerToggle: (layerId: string) => void;
+}) => (
   <div className="space-y-4">
     <div>
       <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -58,18 +87,19 @@ const MapControls = () => (
       </h4>
       <div className="space-y-2">
         {[
-          { name: "Satellite Imagery", enabled: true },
-          { name: "NDVI Overlay", enabled: true },
-          { name: "Project Boundaries", enabled: true },
-          { name: "Bathymetry", enabled: false },
-          { name: "Ocean Currents", enabled: false },
+          { id: "satellite", name: "Satellite Imagery", enabled: layers.satellite },
+          { id: "ndvi", name: "NDVI Overlay", enabled: layers.ndvi },
+          { id: "boundaries", name: "Project Boundaries", enabled: layers.boundaries },
+          { id: "bathymetry", name: "Bathymetry", enabled: layers.bathymetry },
+          { id: "currents", name: "Ocean Currents", enabled: layers.currents },
         ].map((layer) => (
-          <div key={layer.name} className="flex items-center justify-between">
+          <div key={layer.id} className="flex items-center justify-between">
             <span className="text-sm">{layer.name}</span>
             <Button
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0"
+              onClick={() => onLayerToggle(layer.id)}
             >
               {layer.enabled ? (
                 <Eye className="h-3 w-3" />
@@ -103,15 +133,15 @@ const MapControls = () => (
     <div>
       <h4 className="font-semibold mb-2">Map Controls</h4>
       <div className="grid grid-cols-2 gap-2">
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={onZoomIn}>
           <ZoomIn className="h-3 w-3 mr-1" />
           Zoom In
         </Button>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={onZoomOut}>
           <ZoomOut className="h-3 w-3 mr-1" />
           Zoom Out
         </Button>
-        <Button variant="outline" size="sm" className="col-span-2">
+        <Button variant="outline" size="sm" className="col-span-2" onClick={onResetView}>
           <RotateCcw className="h-3 w-3 mr-1" />
           Reset View
         </Button>
@@ -120,72 +150,57 @@ const MapControls = () => (
   </div>
 );
 
-const MapPlaceholder = () => (
-  <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-    <div className="text-center space-y-4">
-      <Satellite className="h-12 w-12 text-muted-foreground mx-auto" />
-      <div>
-        <h3 className="text-lg font-semibold text-muted-foreground">Interactive Map</h3>
-        <p className="text-sm text-muted-foreground">
-          Global view of marine restoration projects
-        </p>
-      </div>
-      <div className="grid grid-cols-3 gap-4 mt-6">
-        {/* Simulated map markers */}
-        <div className="space-y-2">
-          <div className="w-3 h-3 bg-green-500 rounded-full mx-auto"></div>
-          <div className="text-xs text-center">Sundarbans</div>
-        </div>
-        <div className="space-y-2">
-          <div className="w-3 h-3 bg-blue-500 rounded-full mx-auto"></div>
-          <div className="text-xs text-center">Great Barrier</div>
-        </div>
-        <div className="space-y-2">
-          <div className="w-3 h-3 bg-orange-500 rounded-full mx-auto"></div>
-          <div className="text-xs text-center">Caribbean</div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
 export const MapVisualization = () => {
+  const mapRef = useRef<MapRef>(null);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [layers, setLayers] = useState({
+    satellite: true,
+    ndvi: true,
+    boundaries: true,
+    bathymetry: false,
+    currents: false,
+    streetNames: false
+  });
 
-  const projectLocations = [
-    {
-      name: "Sundarbans Mangrove Restoration",
-      coordinates: "22.5° N, 89.0° E",
-      status: "Active",
-      type: "Mangrove Forest",
-      ndvi: 0.85,
-      area: 2500
-    },
-    {
-      name: "Great Barrier Reef Recovery",
-      coordinates: "16.3° S, 145.8° E",
-      status: "Monitoring",
-      type: "Coral Reef",
-      ndvi: 0.68,
-      area: 1800
-    },
-    {
-      name: "Caribbean Seagrass Initiative",
-      coordinates: "18.2° N, 77.5° W",
-      status: "Active",
-      type: "Seagrass Beds",
-      ndvi: 0.79,
-      area: 1200
-    },
-    {
-      name: "North Sea Salt Marsh",
-      coordinates: "53.3° N, 6.8° E",
-      status: "Planning",
-      type: "Salt Marsh",
-      ndvi: 0.72,
-      area: 950
-    }
-  ];
+  const handleLayerToggle = (layerId: string) => {
+    setLayers(prev => ({
+      ...prev,
+      [layerId]: !prev[layerId]
+    }));
+  };
+
+  const handleZoomIn = () => {
+    mapRef.current?.zoomIn();
+  };
+
+  const handleZoomOut = () => {
+    mapRef.current?.zoomOut();
+  };
+
+  const handleResetView = () => {
+    mapRef.current?.resetView();
+  };
+
+  const projectLocations = mockProjects.map(project => ({
+    name: project.name,
+    coordinates: [project.coordinates.lat, project.coordinates.lng] as [number, number],
+    status: project.status === 'active' ? 'Active' : 
+            project.status === 'monitoring' ? 'Monitoring' :
+            project.status === 'verified' ? 'Verified' :
+            project.status === 'pending' ? 'Planning' : 'Completed',
+    type: project.name.toLowerCase().includes('mangrove') ? 'Mangrove Forest' :
+          project.name.toLowerCase().includes('coral') ? 'Coral Reef' :
+          project.name.toLowerCase().includes('seagrass') ? 'Seagrass Beds' :
+          project.name.toLowerCase().includes('salt') ? 'Salt Marsh' :
+          project.name.toLowerCase().includes('wetland') ? 'Wetland' :
+          project.name.toLowerCase().includes('lagoon') ? 'Lagoon' :
+          project.name.toLowerCase().includes('lake') ? 'Lake Ecosystem' :
+          project.name.toLowerCase().includes('backwater') ? 'Backwater Ecosystem' :
+          project.name.toLowerCase().includes('dune') ? 'Coastal Dune' : 'Marine Ecosystem',
+    ndvi: project.ndviScore,
+    area: project.area,
+    description: `${project.location} - ${project.status.charAt(0).toUpperCase() + project.status.slice(1)} restoration project with ${project.creditsIssued} credits issued.`
+  }));
 
   return (
     <div className="space-y-6">
@@ -193,7 +208,7 @@ export const MapVisualization = () => {
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">Map Visualization</h2>
           <p className="text-muted-foreground">
-            Global overview of marine restoration project locations
+            Indian coastal and marine restoration project locations
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -225,7 +240,11 @@ export const MapVisualization = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <MapPlaceholder />
+                  <InteractiveMap 
+                    ref={mapRef}
+                    projectLocations={projectLocations}
+                    layers={layers}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -236,7 +255,13 @@ export const MapVisualization = () => {
                   <CardTitle className="text-lg">Map Controls</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <MapControls />
+                  <MapControls 
+                    onZoomIn={handleZoomIn}
+                    onZoomOut={handleZoomOut}
+                    onResetView={handleResetView}
+                    layers={layers}
+                    onLayerToggle={handleLayerToggle}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -265,9 +290,54 @@ export const MapVisualization = () => {
         <TabsContent value="regions" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { region: "Indo-Pacific", projects: 12, area: "45,600 ha", health: "Good" },
-              { region: "Atlantic", projects: 8, area: "32,400 ha", health: "Excellent" },
-              { region: "Arctic", projects: 4, area: "18,200 ha", health: "Moderate" },
+              { 
+                region: "East Coast", 
+                projects: mockProjects.filter(p => 
+                  p.location.includes('West Bengal') || 
+                  p.location.includes('Odisha') || 
+                  p.location.includes('Andhra Pradesh') || 
+                  p.location.includes('Tamil Nadu') || 
+                  p.location.includes('Puducherry')
+                ).length, 
+                area: `${Math.round(mockProjects.filter(p => 
+                  p.location.includes('West Bengal') || 
+                  p.location.includes('Odisha') || 
+                  p.location.includes('Andhra Pradesh') || 
+                  p.location.includes('Tamil Nadu') || 
+                  p.location.includes('Puducherry')
+                ).reduce((sum, p) => sum + p.area, 0)).toLocaleString()} ha`, 
+                health: "Good" 
+              },
+              { 
+                region: "West Coast", 
+                projects: mockProjects.filter(p => 
+                  p.location.includes('Kerala') || 
+                  p.location.includes('Karnataka') || 
+                  p.location.includes('Goa') || 
+                  p.location.includes('Maharashtra') || 
+                  p.location.includes('Gujarat')
+                ).length, 
+                area: `${Math.round(mockProjects.filter(p => 
+                  p.location.includes('Kerala') || 
+                  p.location.includes('Karnataka') || 
+                  p.location.includes('Goa') || 
+                  p.location.includes('Maharashtra') || 
+                  p.location.includes('Gujarat')
+                ).reduce((sum, p) => sum + p.area, 0)).toLocaleString()} ha`, 
+                health: "Excellent" 
+              },
+              { 
+                region: "Islands", 
+                projects: mockProjects.filter(p => 
+                  p.location.includes('Andaman') || 
+                  p.location.includes('Lakshadweep')
+                ).length, 
+                area: `${Math.round(mockProjects.filter(p => 
+                  p.location.includes('Andaman') || 
+                  p.location.includes('Lakshadweep')
+                ).reduce((sum, p) => sum + p.area, 0)).toLocaleString()} ha`, 
+                health: "Excellent" 
+              },
             ].map((region) => (
               <Card key={region.region}>
                 <CardHeader>
@@ -311,9 +381,10 @@ export const MapVisualization = () => {
                   <h4 className="font-semibold mb-4">Recent Imagery Updates</h4>
                   <div className="space-y-3">
                     {[
-                      { site: "Sundarbans East", date: "2 days ago", resolution: "10m", quality: "High" },
-                      { site: "Coral Triangle", date: "5 days ago", resolution: "30m", quality: "Medium" },
-                      { site: "Caribbean Bay", date: "1 week ago", resolution: "10m", quality: "High" },
+                      { site: "Sundarbans Mangroves", date: "2 days ago", resolution: "10m", quality: "High" },
+                      { site: "Andaman Coral Reefs", date: "4 days ago", resolution: "30m", quality: "Medium" },
+                      { site: "Gulf of Mannar", date: "1 week ago", resolution: "10m", quality: "High" },
+                      { site: "Kerala Backwaters", date: "5 days ago", resolution: "15m", quality: "High" },
                     ].map((update) => (
                       <div key={update.site} className="flex justify-between items-center p-2 border rounded">
                         <div>
