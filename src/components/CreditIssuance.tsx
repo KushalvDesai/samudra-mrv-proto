@@ -90,14 +90,15 @@ export const CreditIssuance = () => {
   };
 
   return (
-    <Card className="shadow-soft">
-      <CardHeader>
-        <CardTitle className="text-2xl flex items-center space-x-2">
-          <Coins className="h-6 w-6 text-primary" />
-          <span>Carbon Credit Issuance</span>
-        </CardTitle>
-        <CardDescription>
-          Calculate and mint verified carbon offset credits from restoration projects
+    <div className="h-full p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <Card className="shadow-soft h-full flex flex-col">
+        <CardHeader className="pb-4 flex-shrink-0">
+          <CardTitle className="text-lg sm:text-xl lg:text-2xl flex items-center space-x-2 min-h-[2rem] leading-tight">
+            <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+            <span>Carbon Credit Issuance</span>
+          </CardTitle>
+          <CardDescription className="text-sm leading-relaxed">
+            Calculate and mint verified carbon offset credits from restoration projects
         </CardDescription>
       </CardHeader>
 
@@ -339,6 +340,7 @@ export const CreditIssuance = () => {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 };
 

@@ -1,139 +1,303 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SidebarNavigation } from "@/components/SidebarNavigation";
+import { TopNavigation } from "@/components/TopNavigation";
+import { StatisticsCards } from "@/components/StatisticsCards";
+import { DashboardCharts } from "@/components/DashboardCharts";
 import { ProjectRegistry } from "@/components/ProjectRegistry";
 import { ImageUpload } from "@/components/ImageUpload";
 import { NotificationPanel } from "@/components/NotificationPanel";
 import { CreditIssuance } from "@/components/CreditIssuance";
-import { Leaf, Waves, TrendingUp, CheckCircle, Users, BarChart3 } from "lucide-react";
-import { dashboardStats } from "@/data/mockProjects";
-
-const StatCard = ({ 
-  title, 
-  value, 
-  description, 
-  icon: Icon, 
-  trend 
-}: { 
-  title: string; 
-  value: string | number; 
-  description: string; 
-  icon: any; 
-  trend?: string; 
-}) => (
-  <Card className="hover:shadow-medium transition-all duration-300">
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-      <Icon className="h-4 w-4 text-primary" />
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
-      <p className="text-xs text-muted-foreground mt-1">{description}</p>
-      {trend && (
-        <div className="flex items-center mt-2 text-xs text-success">
-          <TrendingUp className="h-3 w-3 mr-1" />
-          {trend}
-        </div>
-      )}
-    </CardContent>
-  </Card>
-);
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import { MapVisualization } from "@/components/MapVisualization";
+import { UserManagement } from "@/components/UserManagement";
+import { Settings } from "@/components/Settings";
+import { BlockchainDashboard } from "@/components/BlockchainDashboard";
+import { NationalRegistryOverview } from "@/components/NationalRegistryOverview";
+import { RegistryInventory } from "@/components/RegistryInventory";
+import { ValidationMethodology } from "@/components/ValidationMethodology";
+import { ValidationVerification } from "@/components/ValidationVerification";
+import { ValidationResearch } from "@/components/ValidationResearch";
+import { ComplianceOversight } from "@/components/ComplianceOversight";
+import { CompliancePerformance } from "@/components/CompliancePerformance";
+import { ComplianceAudits } from "@/components/ComplianceAudits";
+import { BlockchainTransactions } from "@/components/BlockchainTransactions";
+import { BlockchainContracts } from "@/components/BlockchainContracts";
+import { BlockchainValidation } from "@/components/BlockchainValidation";
+import { CommunityNGOs } from "@/components/CommunityNGOs";
+import { CommunityPanchayats } from "@/components/CommunityPanchayats";
+import { CommunityEngagement } from "@/components/CommunityEngagement";
+import { AnalyticsInsights } from "@/components/AnalyticsInsights";
+import { AnalyticsPolicy } from "@/components/AnalyticsPolicy";
+import { AdministrationUsers } from "@/components/AdministrationUsers";
+import { AdministrationInstitutions } from "@/components/AdministrationInstitutions";
+import { useState } from "react";
 
 export const Dashboard = () => {
+  const [activeSection, setActiveSection] = useState("registry-overview");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleThemeToggle = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  // Enhanced section change handler with debugging and loading state
+  const handleSectionChange = (sectionId: string) => {
+    console.log("🔄 Section changed to:", sectionId);
+    setIsLoading(true);
+    setActiveSection(sectionId);
+    
+    // Show brief success feedback
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log("✅ Successfully loaded:", sectionId);
+    }, 150);
+  };
+
+  // Enhanced breadcrumb logic
+  const getBreadcrumbs = () => {
+    const [section, subsection] = activeSection.split('-');
+    
+    const sectionLabels: { [key: string]: string } = {
+      registry: "Registry",
+      validation: "Validation", 
+      compliance: "Compliance",
+      blockchain: "Blockchain",
+      community: "Community",
+      analytics: "Analytics",
+      administration: "Administration"
+    };
+
+    const subsectionLabels: { [key: string]: string } = {
+      overview: "Overview",
+      projects: "Projects",
+      inventory: "Inventory",
+      methodology: "Methodology",
+      verification: "Verification", 
+      research: "Research",
+      oversight: "Oversight",
+      audits: "Audits",
+      performance: "Performance",
+      transactions: "Transactions",
+      contracts: "Contracts",
+      ngos: "NGOs",
+      panchayats: "Panchayats",
+      communities: "Communities",
+      statistics: "Statistics",
+      insights: "Insights",
+      policy: "Policy",
+      users: "Users",
+      institutions: "Institutions",
+      system: "System"
+    };
+
+    return [
+      { label: "NCCR Blue Carbon" },
+      { label: sectionLabels[section] || section },
+      ...(subsection ? [{ label: subsectionLabels[subsection] || subsection }] : [])
+    ];
+  };
+
+  const renderMainContent = () => {
+    console.log("📍 Rendering content for section:", activeSection);
+    
+    switch (activeSection) {
+      // National Registry sections
+      case "registry-overview":
+        return (
+          <div className="h-full">
+            <NationalRegistryOverview />
+          </div>
+        );
+      case "registry-projects":
+        return (
+          <div className="h-full">
+            <ProjectRegistry />
+          </div>
+        );
+      case "registry-inventory":
+        return (
+          <div className="h-full">
+            <RegistryInventory />
+          </div>
+        );
+
+      // Scientific Validation sections
+      case "validation-methodology":
+        return (
+          <div className="h-full">
+            <ValidationMethodology />
+          </div>
+        );
+      case "validation-verification":
+        return (
+          <div className="h-full">
+            <ValidationVerification />
+          </div>
+        );
+      case "validation-research":
+        return (
+          <div className="h-full">
+            <ValidationResearch />
+          </div>
+        );
+
+      // Compliance & Monitoring sections  
+      case "compliance-oversight":
+        return (
+          <div className="h-full">
+            <ComplianceOversight />
+          </div>
+        );
+      case "compliance-audits":
+        return (
+          <div className="h-full">
+            <ComplianceAudits />
+          </div>
+        );
+      case "compliance-performance":
+        return (
+          <div className="h-full">
+            <CompliancePerformance />
+          </div>
+        );
+
+      // Blockchain sections
+      case "blockchain-transactions":
+        return (
+          <div className="h-full">
+            <BlockchainTransactions />
+          </div>
+        );
+      case "blockchain-contracts":
+        return (
+          <div className="h-full">
+            <BlockchainContracts />
+          </div>
+        );
+      case "blockchain-validation":
+        return (
+          <div className="h-full">
+            <BlockchainValidation />
+          </div>
+        );
+
+      // Community sections
+      case "community-ngos":
+        return (
+          <div className="h-full">
+            <CommunityNGOs />
+          </div>
+        );
+      case "community-panchayats":
+        return (
+          <div className="h-full">
+            <CommunityPanchayats />
+          </div>
+        );
+      case "community-communities":
+        return (
+          <div className="h-full">
+            <CommunityEngagement />
+          </div>
+        );
+
+      // Analytics & Reporting sections
+      case "analytics-statistics":
+        return (
+          <div className="h-full flex flex-col">
+            <div className="mb-6">
+              <StatisticsCards />
+            </div>
+            <div className="flex-1 min-h-0">
+              <DashboardCharts />
+            </div>
+          </div>
+        );
+      case "analytics-insights":
+        return (
+          <div className="h-full">
+            <AnalyticsInsights />
+          </div>
+        );
+      case "analytics-policy":
+        return (
+          <div className="h-full">
+            <AnalyticsPolicy />
+          </div>
+        );
+
+      // Administration sections
+      case "administration-users":
+        return (
+          <div className="h-full">
+            <AdministrationUsers />
+          </div>
+        );
+      case "administration-institutions":
+        return (
+          <div className="h-full">
+            <AdministrationInstitutions />
+          </div>
+        );
+      case "administration-system":
+        return (
+          <div className="h-full">
+            <Settings />
+          </div>
+        );
+
+      // Default case - Registry Overview
+      default:
+        console.warn("⚠️ Unknown section:", activeSection, "- defaulting to Registry Overview");
+        return (
+          <div className="h-full">
+            <NationalRegistryOverview />
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/10 to-muted/20">
-      <div className="container mx-auto p-6 space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <Waves className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold bg-gradient-ocean bg-clip-text text-transparent">
-              SamudraMRV Admin
-            </h1>
-          </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Marine & Coastal Ecosystem Restoration Monitoring Dashboard
-          </p>
-        </div>
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
+      {/* Fixed Sidebar */}
+      <div className="flex-shrink-0">
+        <SidebarNavigation
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+        />
+      </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-          <StatCard
-            title="Total Projects"
-            value={dashboardStats.totalProjects}
-            description="Active restoration initiatives"
-            icon={BarChart3}
-            trend="+12% from last month"
-          />
-          <StatCard
-            title="Carbon Credits Issued"
-            value={dashboardStats.totalCreditsIssued.toLocaleString()}
-            description="Verified carbon offset credits"
-            icon={Leaf}
-            trend="+8.2% this quarter"
-          />
-          <StatCard
-            title="Carbon Sequestered"
-            value={`${dashboardStats.totalCarbonSequestered}t`}
-            description="Total CO₂ captured"
-            icon={TrendingUp}
-            trend="+15.4% from target"
-          />
-          <StatCard
-            title="Active Projects"
-            value={dashboardStats.activeProjects}
-            description="Currently monitored sites"
-            icon={Users}
-          />
-          <StatCard
-            title="Average NDVI Score"
-            value={dashboardStats.averageNdvi}
-            description="Ecosystem health index"
-            icon={CheckCircle}
-            trend="Healthy range"
-          />
-          <StatCard
-            title="Pending Verification"
-            value={dashboardStats.projectsAwaitingVerification}
-            description="Projects awaiting review"
-            icon={Waves}
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Fixed Top Navigation */}
+        <div className="flex-shrink-0">
+          <TopNavigation
+            breadcrumbs={getBreadcrumbs()}
+            notifications={3}
+            messages={2}
+            onThemeToggle={handleThemeToggle}
+            isDarkMode={isDarkMode}
           />
         </div>
 
-        {/* Main Tabs */}
-        <Tabs defaultValue="registry" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-card shadow-soft">
-            <TabsTrigger value="registry" className="data-[state=active]:bg-gradient-ocean data-[state=active]:text-white">
-              Project Registry
-            </TabsTrigger>
-            <TabsTrigger value="upload" className="data-[state=active]:bg-gradient-forest data-[state=active]:text-white">
-              Image Upload
-            </TabsTrigger>
-            <TabsTrigger value="credits" className="data-[state=active]:bg-gradient-earth data-[state=active]:text-white">
-              Credit Issuance
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="data-[state=active]:bg-gradient-hero data-[state=active]:text-white">
-              Notifications
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="mt-6">
-            <TabsContent value="registry" className="animate-slide-up">
-              <ProjectRegistry />
-            </TabsContent>
-            
-            <TabsContent value="upload" className="animate-slide-up">
-              <ImageUpload />
-            </TabsContent>
-            
-            <TabsContent value="credits" className="animate-slide-up">
-              <CreditIssuance />
-            </TabsContent>
-            
-            <TabsContent value="notifications" className="animate-slide-up">
-              <NotificationPanel />
-            </TabsContent>
-          </div>
-        </Tabs>
+        {/* Scrollable Content Area */}
+        <div className="flex-1 flex min-h-0 overflow-hidden">
+          {/* Main Content - Full Width */}
+          <main className="flex-1 overflow-auto">
+            <div className="p-6 h-full">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="flex items-center space-x-3">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <span className="text-gray-600">Loading...</span>
+                  </div>
+                </div>
+              ) : (
+                renderMainContent()
+              )}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
